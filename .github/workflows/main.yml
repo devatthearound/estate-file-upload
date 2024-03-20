@@ -1,0 +1,23 @@
+name: Deploy File Upload
+
+on:
+  push:
+    branches:
+      - main # 또는 대상 브랜치
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted # self-hosted runner 사용
+    steps:
+      - uses: actions/checkout@v2 # 코드 체크아웃
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18' # 원하는 Node.js 버전
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Restart Node.js server
+        run:  pm2 restart 4
