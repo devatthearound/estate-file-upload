@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>File Upload Form</title>
+  </head>
+  <style>
+    #margin {
+      margin-top: 100px; /* 결과와 버튼 사이의 공간 */
+      border-bottom: 1px solid #000; /* 결과 아래에 밑줄 추가 */
+    }
+  </style>
+  <body>
+    <form id="uploadForm">
+      <label for="file">파일 선택:</label>
+      <input type="file" id="file" name="file" /><br /><br />
+
+      <button type="button" onclick="submitForm()">업로드</button>
+      <div id="margin"></div>
+      <div id="result">
+        파일 목록
+        <ul id="fileList"></ul>
+      </div>
+    </form>
+    <script>
+      function submitForm() {
+        const password = prompt("업로드를 진행하려면 비밀번호를 입력해주세요.");
+
+        // 예시로 설정한 비밀번호입니다. 실제 어플리케이션에서는 이 방식을 사용하지 마세요.
+        const correctPassword = "blackpeach&*()";
+
+        if (password === correctPassword) {
+          var form = document.getElementById("uploadForm");
+          var formData = new FormData(form);
+
+          // FormData 확인
+          for (var pair of formData.entries()) {
+            console.log(pair[0] + ", " + pair[1]);
+          }
+
+          // AJAX로 서버에 FormData 전송
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "http://bpvista.com:3101/file"); 
+          xhr.send(formData);
+
+          xhr.onload = function () {
+            console.log("서버 응답: " + xhr.responseText);
+            var response = JSON.parse(xhr.responseText);
+            console.log(xhr.status);
+            if (xhr.status == 201) {
+              console.log(response);
+              // 성공 메시지 출력 (선택적)
+              alert("성공: " + response.message);
+              fetchFiles();
+            } else {
+              alert("에러가 발생했습니다:\n " + response.error);
+            }
+          };
+        } else {
+          alert("비밀번호가 올바르지 않습니다.");
+          // 비밀번호 오류 처리
+        }
+      }
+
+      function fetchFiles() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "http://bpvista.com:3101/file");
+        xhr.onload = function () {
+          if (xhr.status == 200) {
+            var files = JSON.parse(xhr.responseText);
+            var fileList = document.getElementById("fileList");
+            fileList.innerHTML = ""; // 파일 목록 초기화
+            files.forEach(function (file) {
+              var li = document.createElement("li");
+              li.textContent = file.name;
+              fileList.appendChild(li);
+            });
+          } else {
+            alert("파일 목록을 불러오는 데 실패했습니다.");
+          }
+        };
+        xhr.send();
+      }
+
+      window.onload = function () {
+        console.log("Window loaded.");
+        fetchFiles();
+      };
+    </script>
+  </body>
+</html>
