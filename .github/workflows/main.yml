@@ -20,4 +20,4 @@ jobs:
         run: npm install
 
       - name: Restart Node.js server
-        run:  pwd
+        run:  pm2 restart 4
